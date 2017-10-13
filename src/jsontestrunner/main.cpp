@@ -1,7 +1,10 @@
-// Copyright 2007-2010 Baptiste Lepilleur
+// Copyright 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 // Distributed under MIT license, or public domain if desired and
 // recognized in your jurisdiction.
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 /* This executable is used for testing parser/writer using real JSON files.
  */
@@ -324,3 +327,5 @@ int main(int argc, const char* argv[]) {
     return 1;
   }
 }
+
+#pragma GCC diagnostic pop

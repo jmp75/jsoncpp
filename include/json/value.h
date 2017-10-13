@@ -1,4 +1,4 @@
-// Copyright 2007-2010 Baptiste Lepilleur
+// Copyright 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
 // Distributed under MIT license, or public domain if desired and
 // recognized in your jurisdiction.
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
@@ -23,7 +23,7 @@
 #endif
 
 //Conditional NORETURN attribute on the throw functions would:
-// a) suppress false positives from static code analysis 
+// a) suppress false positives from static code analysis
 // b) possibly improve optimization opportunities.
 #if !defined(JSONCPP_NORETURN)
 #  if defined(_MSC_VER)
@@ -64,7 +64,7 @@ protected:
 /** Exceptions which the user cannot easily avoid.
  *
  * E.g. out-of-memory (when we use malloc), stack-overflow, malicious input
- * 
+ *
  * \remark derived from Json::Exception
  */
 class JSON_API RuntimeError : public Exception {
@@ -75,7 +75,7 @@ public:
 /** Exceptions thrown by JSON_ASSERT/JSON_FAIL macros.
  *
  * These are precondition-violations (user bugs) and internal errors (our bugs).
- * 
+ *
  * \remark derived from Json::Exception
  */
 class JSON_API LogicError : public Exception {
@@ -233,7 +233,12 @@ private:
     CZString(CZString&& other);
 #endif
     ~CZString();
-    CZString& operator=(CZString other);
+    CZString& operator=(const CZString& other);
+
+#if JSON_HAS_RVALUE_REFERENCES
+    CZString& operator=(CZString&& other);
+#endif
+
     bool operator<(CZString const& other) const;
     bool operator==(CZString const& other) const;
     ArrayIndex index() const;
@@ -323,10 +328,16 @@ Json::Value obj_value(Json::objectValue); // {}
   /// Deep copy, then swap(other).
   /// \note Over-write existing comments. To preserve comments, use #swapPayload().
   Value& operator=(Value other);
+
   /// Swap everything.
   void swap(Value& other);
   /// Swap values but leave comments and source offsets in place.
   void swapPayload(Value& other);
+
+  /// copy everything.
+  void copy(const Value& other);
+  /// copy values but leave comments and source offsets in place.
+  void copyPayload(const Value& other);
 
   ValueType type() const;
 
@@ -438,6 +449,10 @@ Json::Value obj_value(Json::objectValue); // {}
   /// Equivalent to jsonvalue[jsonvalue.size()] = value;
   Value& append(const Value& value);
 
+#if JSON_HAS_RVALUE_REFERENCES
+  Value& append(Value&& value);
+#endif
+
   /// Access an object value by name, create a null member if it does not exist.
   /// \note Because of our implementation, keys are limited to 2^30 -1 chars.
   ///  Exceeding that will cause an exception.
@@ -503,10 +518,12 @@ Json::Value obj_value(Json::objectValue); // {}
   /// \pre type() is objectValue or nullValue
   /// \post type() is unchanged
   /// \deprecated
+  JSONCPP_DEPRECATED("")
   Value removeMember(const char* key);
   /// Same as removeMember(const char*)
   /// \param key may contain embedded nulls.
   /// \deprecated
+  JSONCPP_DEPRECATED("")
   Value removeMember(const JSONCPP_STRING& key);
   /// Same as removeMember(const char* begin, const char* end, Value* removed),
   /// but 'key' is null-terminated.
